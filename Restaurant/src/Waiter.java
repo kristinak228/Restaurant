@@ -1,7 +1,6 @@
 import java.util.Random;
 
 /**
- *
  * @author Kristina Kolibab
  */
 
@@ -13,10 +12,10 @@ public class Waiter implements Runnable{
     private Table[] tables; //array of table objects waiter waits on
     private static String waiterName; //name of waiter
     private String[] customerNames; //names of customers served by waiters
+    private String[][] courses; //i customer, j courses
     
-    //double array, of courses for each customer of this waiter
-    //course[i][j] has the jth course for the ith customer of this waiter
-    private String[][] courses; 
+    String currentCourse; //helps for letting Table keep up to date
+    Table table;
     
     //Constructor
     public Waiter(Table[] tables, String waiterName, String[] customerNames, 
@@ -25,11 +24,27 @@ public class Waiter implements Runnable{
         this.waiterName = waiterName;
         this.customerNames = customerNames;
         this.courses = courses;
-    }
+    }   
     
     //Method
+    @Override
     public void run(){ //for each customer
+        
         Random rand = new Random();
+
+        for(int i = 0; i < customerNames.length; i++){ //all customers
+            for(int j = 0; j < 3; j++){ //3 courses
+                currentCourse = courses[i][j];
+                System.out.println(waiterName + " serves " + customerNames[i] + " " + courses[i][j]);
+                tables[i].serve(currentCourse); //current courses for current customer
+                
+                try{
+                    Thread.sleep(rand.nextInt(MAX_WAITER_MILLIS));
+                } catch(InterruptedException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+            tables[i].serve("Course Done"); //customer is done with all three meals
+        } 
     }
 }
-
